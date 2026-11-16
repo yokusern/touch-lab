@@ -26,7 +26,7 @@ export function QuestList() {
         <div className="flex items-center justify-between gap-3 text-sm">
           <span className="font-bold">力学モジュールの進捗</span>
           <span className="num text-muted">
-            {cleared} / {QUESTS.length} クリア
+            {progress ? cleared : "–"} / {QUESTS.length} クリア
           </span>
         </div>
         <div className="mt-2 h-2 overflow-hidden rounded-full bg-bg-deep" aria-hidden>
@@ -49,7 +49,9 @@ export function QuestList() {
                 <div className="flex flex-1 flex-col gap-2 p-4">
                   <div className="flex items-center justify-between gap-2">
                     <span className="num text-sm font-bold text-physics">{q.number}</span>
-                    {rec?.cleared ? (
+                    {progress === null ? (
+                      <span className="h-5 w-12 rounded-full border border-line" aria-hidden />
+                    ) : rec?.cleared ? (
                       <span className="rounded-full bg-ok px-2 py-0.5 text-xs font-black text-accent-ink">クリア</span>
                     ) : rec ? (
                       <span className="rounded-full border border-amber px-2 py-0.5 text-xs font-bold text-amber">挑戦中</span>
@@ -68,7 +70,7 @@ export function QuestList() {
                       ))}
                     </div>
                     <span className="num text-xs text-muted">
-                      {rec ? `ベスト ${rec.best}点` : `${CLEAR_SCORE}点でクリア`}
+                      {progress === null ? " " : rec ? `ベスト ${rec.best}点` : `${CLEAR_SCORE}点でクリア`}
                     </span>
                   </div>
                 </div>
