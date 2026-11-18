@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState, type ReactNode } from "react";
+import { useState, useSyncExternalStore, type ReactNode } from "react";
 import { CLEAR_SCORE, type QuestRecord } from "@/lib/progress";
 import { nextQuest, type QuestMeta } from "@/lib/quests";
 
@@ -404,9 +404,16 @@ export function ExplanationCard({
   );
 }
 
+const noopSubscribe = () => () => {};
+
 export function ShareBox({ text, path }: { text: string; path: string }) {
   const [copied, setCopied] = useState(false);
-  const url = typeof window === "undefined" ? path : `${window.location.origin}${path}`;
+  const origin = useSyncExternalStore(
+    noopSubscribe,
+    () => window.location.origin,
+    () => "",
+  );
+  const url = `${origin}${path}`;
   const full = `${text}\n${url}`;
 
   const copy = async () => {

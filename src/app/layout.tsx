@@ -37,9 +37,15 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           <div className="mx-auto flex max-w-5xl items-center justify-between gap-3 px-4 py-3">
             <Link href="/" className="flex items-center gap-2 font-black tracking-wide">
               <LogoMark />
-              <span>さわれる実験室</span>
+              <span className="text-sm sm:text-base">さわれる実験室</span>
             </Link>
-            <nav className="flex items-center gap-4 text-sm text-muted">
+            <nav className="flex items-center gap-3 text-xs text-muted sm:gap-4 sm:text-sm">
+              <Link href="/sandbox" className="hover:text-ink">
+                自由実験室
+              </Link>
+              <Link href="/whatif" className="hover:text-ink">
+                もしも
+              </Link>
               <Link href="/physics" className="hover:text-ink">
                 クエスト
               </Link>
@@ -49,8 +55,8 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <main className="flex-1">{children}</main>
         <footer className="border-t border-line bg-bg-deep/80 text-xs text-muted">
           <div className="mx-auto max-w-5xl space-y-1 px-4 py-6">
-            <p>物理計算は物理エンジンを使わず、式と細かい刻みの数値計算で自前で行っています。前提条件は各クエストの解説に明記しています。</p>
-            <p>進捗はこの端末のブラウザにだけ保存されます（ログイン不要・送信なし）。</p>
+            <p>物理計算は既製の物理エンジンを使わず、式と細かい刻みの数値計算で自前で行っています（自由実験室も自作のエンジン）。前提条件は各ページの解説に明記しています。</p>
+            <p>進捗と保存した実験はこの端末のブラウザにだけ保存されます（ログイン不要・送信なし）。</p>
           </div>
         </footer>
       </body>

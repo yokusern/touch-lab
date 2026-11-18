@@ -45,6 +45,36 @@ export default function Home() {
         </div>
       </section>
 
+      <section aria-labelledby="free-h" className="space-y-3">
+        <h2 id="free-h" className="text-sm font-bold tracking-wide text-muted">
+          自由に実験する
+        </h2>
+        <div className="grid gap-4 md:grid-cols-2">
+          <Link
+            href="/sandbox"
+            className="group flex flex-col gap-2 rounded-2xl border-2 border-accent bg-accent/10 p-5 transition hover:-translate-y-0.5 hover:bg-accent/15"
+          >
+            <span className="num text-[11px] font-bold tracking-[0.25em] text-accent">NEW / SANDBOX</span>
+            <span className="text-2xl font-black">自由実験室</span>
+            <span className="text-sm leading-relaxed text-muted">
+              まっさらな世界に、円・箱・坂・ばね・ひも・モーターを置いて▶再生。重力・空気の濃さ・万有引力まで自由に変えて、どんなタイトルの実験でもつくれる。保存とリンク共有つき。
+            </span>
+            <span className="mt-auto pt-2 text-sm font-black text-accent">ひらく →</span>
+          </Link>
+          <Link
+            href="/whatif"
+            className="group flex flex-col gap-2 rounded-2xl border-2 border-amber bg-amber/10 p-5 transition hover:-translate-y-0.5 hover:bg-amber/15"
+          >
+            <span className="num text-[11px] font-bold tracking-[0.25em] text-amber">NEW / WHAT IF</span>
+            <span className="text-2xl font-black">もしも計算機</span>
+            <span className="text-sm leading-relaxed text-muted">
+              全人類が同時に東へ走ったら、1日の長さは変わる？ 地球の自転が止まったら？ 地球規模の「もしも」を、本物の式と測定値で計算する。
+            </span>
+            <span className="mt-auto pt-2 text-sm font-black text-amber">計算してみる →</span>
+          </Link>
+        </div>
+      </section>
+
       <section aria-labelledby="loop-h" className="space-y-3">
         <h2 id="loop-h" className="text-sm font-bold tracking-wide text-muted">
           どのクエストも同じ流れ
