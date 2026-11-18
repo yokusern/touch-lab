@@ -265,7 +265,7 @@ export const SAMPLES: Sample[] = [
         w.addBox(-5.3 + i * 0.5, 0.5, 0.12, 1, { material: "wood", color: i % 2 ? "#e9b47a" : "#d9a066" });
       }
       // 終点：台の上のボール
-      w.addBox(1.95, 0.25, 0.7, 0.5, { isStatic: true, material: "stone", color: GROUND, label: "台" });
+      w.addBox(1.95, 0.25, 0.7, 0.5, { isStatic: true, material: "stone", color: GROUND });
       w.addCircle(1.85, 0.8, 0.3, { material: "rubber", label: "ゴールの玉" });
       return scene(w, this.title, this.note, { cx: -3.5, cy: 2, span: 16 });
     },
