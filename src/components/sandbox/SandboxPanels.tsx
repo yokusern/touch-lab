@@ -160,9 +160,67 @@ function Section({ title, children }: { title: string; children: ReactNode }) {
 
 /* ───────── サンプル ───────── */
 
-export function SamplesPanel({ onOpen, onBlank }: { onOpen: (s: Scene) => void; onBlank: () => void }) {
+export type AiControls = {
+  prompt: string;
+  setPrompt: (s: string) => void;
+  busy: boolean;
+  error: string | null;
+  onGenerate: (prompt: string) => void;
+};
+
+export function SamplesPanel({
+  ai,
+  onOpen,
+  onBlank,
+}: {
+  ai: AiControls;
+  onOpen: (s: Scene) => void;
+  onBlank: () => void;
+}) {
   return (
     <div className="space-y-3">
+      <form
+        className="space-y-2 rounded-xl border-2 border-amber/70 bg-amber/5 p-3"
+        onSubmit={(e) => {
+          e.preventDefault();
+          ai.onGenerate(ai.prompt);
+        }}
+      >
+        <label htmlFor="ai-prompt" className="block font-black">
+          AI に世界をつくってもらう
+        </label>
+        <textarea
+          id="ai-prompt"
+          value={ai.prompt}
+          maxLength={120}
+          rows={2}
+          disabled={ai.busy}
+          onChange={(e) => ai.setPrompt(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" && !e.shiftKey && !e.nativeEvent.isComposing) {
+              e.preventDefault();
+              ai.onGenerate(ai.prompt);
+            }
+          }}
+          placeholder="例：もし摩擦がゼロの世界でドミノを倒したら"
+          className="w-full rounded-md border border-line-strong bg-bg-deep px-2 py-2 text-sm disabled:opacity-60"
+        />
+        <button
+          type="submit"
+          disabled={ai.busy || ai.prompt.trim().length < 2}
+          className="w-full rounded-xl bg-amber py-2.5 text-sm font-black text-accent-ink hover:brightness-110 disabled:opacity-50"
+        >
+          {ai.busy ? "AI が組み立て中…（10〜40秒）" : "AI でつくる"}
+        </button>
+        {ai.error && (
+          <p role="alert" className="rounded-lg border border-bad/60 bg-bad/10 px-2.5 py-2 text-sm">
+            {ai.error}
+          </p>
+        )}
+        <p className="text-[11px] leading-relaxed text-muted">
+          書いた文章は Google の AI（Gemini、無料枠）に送られ、Google のサービス改善に使われることがあります。名前や住所など個人的なことは書かないでね。AI のつくる世界はまちがうこともあるので、できたら道具で直してね。
+        </p>
+      </form>
       <p className="text-sm leading-relaxed text-muted">
         まっさらな世界から、道具で円・箱・坂・ばね・モーターを置いて▶再生。重力や空気の濃さも「世界」タブで自由に変えられます。
       </p>

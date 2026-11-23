@@ -236,6 +236,49 @@ export default function SandboxApp() {
     say("1つ前に戻しました");
   }, [loadScene, say]);
 
+  /* ───────── AI で世界をつくる ───────── */
+
+  const [aiPrompt, setAiPrompt] = useState("");
+  const [aiBusy, setAiBusy] = useState(false);
+  const [aiError, setAiError] = useState<string | null>(null);
+
+  const generate = useCallback(
+    async (prompt: string) => {
+      const p = prompt.trim();
+      if (p.length < 2 || aiBusy) return;
+      setAiBusy(true);
+      setAiError(null);
+      try {
+        const res = await fetch("/api/generate", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ prompt: p }),
+        });
+        const data = await res.json().catch(() => null);
+        if (!res.ok || !data?.scene) {
+          setAiError(data?.error ?? "AI につながりませんでした。少し時間をおいて試してね。");
+          return;
+        }
+        pushUndo();
+        loadScene(data.scene as Scene);
+        say(
+          data.skipped > 0
+            ? `AI がつくりました（作れなかった部品 ${data.skipped} 個は省きました）。▶ 再生してみよう`
+            : "AI がつくりました。▶ 再生してみよう",
+        );
+      } catch {
+        setAiError("通信できませんでした。電波のよい所でもう一度試してね。");
+      } finally {
+        setAiBusy(false);
+      }
+    },
+    [aiBusy, loadScene, pushUndo, say],
+  );
+  const generateRef = useRef(generate);
+  useEffect(() => {
+    generateRef.current = generate;
+  });
+
   // はじめに開いたとき: 共有リンク → タイトル指定 → 前回の続き → まっさら
   useEffect(() => {
     let cancelled = false;
@@ -252,6 +295,11 @@ export default function SandboxApp() {
       if (hash) history.replaceState(null, "", window.location.pathname);
       if (fromHash) say(fromHash.msg);
       setReady(true);
+      if (fromHash?.ai) {
+        setAiPrompt(fromHash.ai);
+        setPanel("samples");
+        void generateRef.current(fromHash.ai);
+      }
     })();
     return () => {
       cancelled = true;
@@ -273,6 +321,11 @@ export default function SandboxApp() {
       }
       history.replaceState(null, "", window.location.pathname);
       say(fromHash.msg);
+      if (fromHash.ai) {
+        setAiPrompt(fromHash.ai);
+        setPanel("samples");
+        void generate(fromHash.ai);
+      }
     };
   });
   useEffect(() => {
@@ -815,6 +868,12 @@ export default function SandboxApp() {
             placeholder="実験のタイトル（なんでもOK）"
             className="mt-1 w-full rounded-lg border border-transparent bg-transparent px-1 py-1 text-xl font-black outline-none hover:border-line focus:border-accent sm:text-2xl"
           />
+          {note && (
+            <p className="line-clamp-3 px-1 text-xs leading-relaxed text-muted">
+              <span className="font-bold text-ink/80">メモ：</span>
+              {note}
+            </p>
+          )}
         </div>
         <Link href="/whatif" className="shrink-0 text-xs text-muted underline underline-offset-4 hover:text-ink sm:text-sm">
           地球規模の「もしも」は計算機へ →
@@ -952,7 +1011,7 @@ export default function SandboxApp() {
           <div className="grid grid-cols-4 gap-1 rounded-xl border border-line-strong bg-panel/90 p-1" role="tablist">
             {(
               [
-                ["samples", "サンプル"],
+                ["samples", "つくる"],
                 ["object", "物体"],
                 ["world", "世界"],
                 ["save", "保存・共有"],
@@ -976,6 +1035,7 @@ export default function SandboxApp() {
           <div className="rounded-2xl border border-line-strong bg-panel/90 p-4">
             {panel === "samples" && (
               <SamplesPanel
+                ai={{ prompt: aiPrompt, setPrompt: setAiPrompt, busy: aiBusy, error: aiError, onGenerate: generate }}
                 onOpen={(sc) => {
                   pushUndo();
                   loadScene(sc);
@@ -1037,7 +1097,16 @@ export default function SandboxApp() {
 /* ───────── 小さな部品 ───────── */
 
 /** URL の # から実験を読む。#w= は共有リンク、#t= はタイトルだけ決めたまっさらな世界 */
-async function sceneFromHash(hash: string): Promise<{ scene: Scene | null; msg: string } | null> {
+async function sceneFromHash(hash: string): Promise<{ scene: Scene | null; msg: string; ai?: string } | null> {
+  if (hash.startsWith("#ai=")) {
+    let t = "";
+    try {
+      t = decodeURIComponent(hash.slice(4)).slice(0, 120).trim();
+    } catch {
+      /* そのまま */
+    }
+    if (t) return { scene: blankScene(t.slice(0, 80)), msg: "AI が世界を組み立てています…", ai: t };
+  }
   if (hash.startsWith("#w=")) {
     const scene = await decodeScene(hash.slice(3));
     return { scene, msg: scene ? "共有された実験を開きました" : "リンクの実験を読み込めませんでした" };

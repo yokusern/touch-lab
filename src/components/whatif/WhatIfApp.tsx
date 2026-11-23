@@ -74,7 +74,7 @@ export default function WhatIfApp() {
             自分の「もしも」をつくる
           </label>
           <p className="mt-1 text-xs leading-relaxed text-muted">
-            タイトルを書いて、自由実験室で世界をつくろう。重力・空気の濃さ・引き合う力も変えられる。
+            タイトルを書くと、AI が自由実験室に世界を組み立てます。自分の手で一からつくることもできます。
           </p>
           <input
             id="custom-whatif"
@@ -84,12 +84,24 @@ export default function WhatIfApp() {
             placeholder="例：もし摩擦がゼロの世界でドミノを倒したら"
             className="mt-2 w-full rounded-md border border-line-strong bg-bg-deep px-2 py-2 text-sm"
           />
-          <Link
-            href={`/sandbox#t=${encodeURIComponent(custom.trim() || "わたしのもしも実験")}`}
-            className="mt-2 inline-flex min-h-10 items-center rounded-xl bg-accent px-4 text-sm font-black text-accent-ink hover:brightness-110"
-          >
-            自由実験室でつくる →
-          </Link>
+          <div className="mt-2 flex flex-wrap gap-2">
+            <Link
+              href={custom.trim().length >= 2 ? `/sandbox#ai=${encodeURIComponent(custom.trim())}` : "#custom-whatif"}
+              aria-disabled={custom.trim().length < 2}
+              className={`inline-flex min-h-10 items-center rounded-xl bg-amber px-4 text-sm font-black text-accent-ink hover:brightness-110 ${
+                custom.trim().length < 2 ? "pointer-events-none opacity-50" : ""
+              }`}
+            >
+              AI でつくる
+            </Link>
+            <Link
+              href={`/sandbox#t=${encodeURIComponent(custom.trim() || "わたしのもしも実験")}`}
+              className="inline-flex min-h-10 items-center rounded-xl border border-accent px-4 text-sm font-bold text-accent hover:bg-accent/10"
+            >
+              自分の手でつくる →
+            </Link>
+          </div>
+          <p className="mt-2 text-[11px] leading-relaxed text-muted">「AI でつくる」は、書いた文章を Google の AI（無料枠）に送ります。</p>
         </div>
       </section>
 
